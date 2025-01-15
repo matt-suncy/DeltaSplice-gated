@@ -4,7 +4,7 @@ from sys import stdout as std_out
 import logging
 import pysam
 from deltasplice.pred_utils import get_delta_prediction, Annotator
-
+from tqdm import tqdm
 def get_options():
     parser=ArgumentParser(description="Version: 1.0.0")
     parser.add_argument('-I', metavar='input', nargs='?', default=std_in,
@@ -48,7 +48,7 @@ def main():
     output = pysam.VariantFile(args.O, mode='w', header=header)
     ann = Annotator(args.R, args.A)
 
-    for record in vcf:
+    for record in tqdm(vcf):
         scores = get_delta_prediction(record, args.D, args.R, args.U, ann, args.M)
         if len(scores) > 0:
             record.info['DeltaSplice'] = scores
