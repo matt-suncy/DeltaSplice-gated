@@ -1,3 +1,5 @@
+# NOTE from matt-suncy: This is a fork to use DeltaSplice as a module for another project.
+
 # DeltaSplice 
 
 A neural network model to predict splice site usage and splicing-altering mutations
