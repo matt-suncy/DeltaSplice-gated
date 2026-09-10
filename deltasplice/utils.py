@@ -449,6 +449,7 @@ def write_splice_sites(fouts, CHROM, NAME, STRAND, TX_START, TX_END, SPECIES, Yp
     # and splice donor (GT) respectively.
 
     num_row = 0
+    exist_combine = set()
 
     if num_row == 0:
         num_row = Yt.shape[0]
@@ -502,4 +503,3 @@ def write_splice_sites(fouts, CHROM, NAME, STRAND, TX_START, TX_END, SPECIES, Yp
                     )
                 )
                 fo.write(line + os.linesep)
-                fo.flush()

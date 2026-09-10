@@ -227,10 +227,6 @@ def get_delta_prediction(record, distance, reference_genome, use_ref, ann, mask)
 def eval_test_data(data, models, save_path, use_ref):
     save_paths=(open(save_path+"_acceptor", "w"),open(save_path+"_donor", "w"))
     [write_splice_site_file_header(_) for _ in save_paths]
-    Y_true_1 = []
-    Y_true_2 = []
-    Y_pred_1 = []
-    Y_pred_2 = []
     for i, d in enumerate(data):
         if i%100==0:
             print("finish eval ", i)
@@ -244,14 +240,7 @@ def eval_test_data(data, models, save_path, use_ref):
         SPECIES = d["species"]
         write_splice_sites(save_paths, CHROM, NAME, STRAND,
                                     TX_START, TX_END, SPECIES, pred, Y)
-        
-        pred_sites = np.nonzero(Y[:, :, 1:].sum(-1))
 
-        Y_true_1.extend(Y[pred_sites][:, 1].flatten())
-        Y_true_2.extend(Y[pred_sites][:, 2].flatten())
-        Y_pred_1.extend(pred[pred_sites][:, 1].flatten())
-        Y_pred_2.extend(pred[pred_sites][:, 2].flatten())
-        
     [_.close() for _ in save_paths]
     
 def eval_mut_data(data, models, save_path, use_ref):

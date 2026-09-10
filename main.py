@@ -23,7 +23,7 @@ def main():
     parser.add_argument("--mut_data_path", default=None, help="the path to mutation data", type=str, nargs="*")
     parser.add_argument("--valid_data_path", default=None, help="the path to validation data", type=str)
     parser.add_argument("--train_num_epochs", default=5, help="the number of training epochs", type=int)
-    parser.add_argument("--num_workers", default=5, help="the number of workers for data loading")
+    parser.add_argument("--num_workers", default=5, help="the number of workers for data loading", type=int)
     parser.add_argument("--batch_size_per_gpu", default=8, help="batch size for each gpu", type=int)
     parser.add_argument("--seed", default=321, help="random seed", type=int)
     parser.add_argument("--load_model_path", default=None, help="the path to load data in the eval mode", type=str, nargs="*")
