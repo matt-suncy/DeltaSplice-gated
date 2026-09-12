@@ -26,7 +26,8 @@ def main():
     parser.add_argument("--num_workers", default=5, help="the number of workers for data loading", type=int)
     parser.add_argument("--batch_size_per_gpu", default=8, help="batch size for each gpu", type=int)
     parser.add_argument("--seed", default=321, help="random seed", type=int)
-    parser.add_argument("--load_model_path", default=None, help="the path to load data in the eval mode", type=str, nargs="*")
+    parser.add_argument("--load_model_path", default=None, help="the path to load data in the eval mode; in train mode with --is_train=True, the first path is used to resume training from a checkpoint", type=str, nargs="*")
+    parser.add_argument("--start_epoch", default=0, help="the epoch number to resume training from (only used in train mode); the first epoch trained will be logged/saved as this epoch number", type=int)
     args = parser.parse_args()
     
     logger.add(os.path.join(args.save_path, "log"))
@@ -53,6 +54,11 @@ def main():
         validation_data = DataLoader(DataGenerator(EL=d_constant.EL, jsonfile=args.valid_data_path), shuffle=False,
                                      batch_size=batch_size, drop_last=True, num_workers=args.num_workers)  
 
+        if args.load_model_path is not None:
+            resume_ckpt = args.load_model_path[0]
+            d_constant.model.load_state_dict(torch.load(resume_ckpt))
+            logger.info("Resuming training from checkpoint {} at start_epoch {}".format(resume_ckpt, args.start_epoch))
+
         summary = GetSummaryStatisticsCallback(
             d_constant.model,
             train_data, validation_data, test_data=[], mut_data=None,
@@ -64,7 +70,7 @@ def main():
         logger.info(
             "Train data size {} validation data size {}".format(len(train_data), len(validation_data),
                                                                                   ))
-        summary.fit(args.train_num_epochs)
+        summary.fit(args.train_num_epochs, start_epoch=args.start_epoch)
         logger.info("Finish training")
         return
 

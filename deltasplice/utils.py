@@ -227,8 +227,8 @@ class GetSummaryStatisticsCallback():
 
         return {"loss": tloss, "val_loss": float("inf")}
 
-    def fit(self, num_epoch):
-        for epoch in range(num_epoch):
+    def fit(self, num_epoch, start_epoch=0):
+        for epoch in range(start_epoch, start_epoch + num_epoch):
             logs = self.train_one_epoch()
             self.on_epoch_end(epoch, logs)
 
@@ -376,6 +376,20 @@ def get_correlation(y_true, y_pred, eps=1e-10):
         idx_true = np.nonzero(
             np.logical_and(y_true >= psi_t + eps, y_true < 1.0 - psi_t)
         )[0]
+        # pearsonr (and spearmanr, less loudly) requires at least 2 points;
+        # a heavily-NaN-gated bin (e.g. after JR filtering) can leave a bin
+        # with 0 or 1 points, so skip the stats and report NaN instead of
+        # letting pearsonr raise and kill the training/eval loop.
+        if np.size(idx_true) < 2:
+            logger.warning(
+                "get_correlation: skipping psi_t={} bin, only {} points".format(
+                    psi_t, np.size(idx_true)
+                )
+            )
+            rho.append(float("nan"))
+            pearson_r.append(float("nan"))
+            num_idx_true.append(np.size(idx_true))
+            continue
         rho1, pval1 = spearmanr(y_true[idx_true], y_pred[idx_true])
         rho.append(rho1)
         pearson_r.append(pearsonr(y_true[idx_true], y_pred[idx_true])[0])
